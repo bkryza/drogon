@@ -527,23 +527,30 @@ void HttpResponseImpl::makeHeaderString(trantor::MsgBuffer &buffer)
             }
             len = 0;
         }
-        else if (sendfileName_.empty())
+        else if (headers_.find("content-length") == headers_.end())
         {
-            auto bodyLength = bodyPtr_ ? bodyPtr_->length() : 0;
-            len = snprintf(buffer.beginWrite(),
-                           buffer.writableBytes(),
-                           contentLengthFormatString<decltype(bodyLength)>(),
-                           bodyLength);
+            if (sendfileName_.empty())
+            {
+                auto bodyLength = bodyPtr_ ? bodyPtr_->length() : 0;
+                len =
+                    snprintf(buffer.beginWrite(),
+                             buffer.writableBytes(),
+                             contentLengthFormatString<decltype(bodyLength)>(),
+                             bodyLength);
+            }
+            else
+            {
+                auto bodyLength = sendfileRange_.second;
+                len =
+                    snprintf(buffer.beginWrite(),
+                             buffer.writableBytes(),
+                             contentLengthFormatString<decltype(bodyLength)>(),
+                             bodyLength);
+            }
+            buffer.hasWritten(len);
         }
-        else
-        {
-            auto bodyLength = sendfileRange_.second;
-            len = snprintf(buffer.beginWrite(),
-                           buffer.writableBytes(),
-                           contentLengthFormatString<decltype(bodyLength)>(),
-                           bodyLength);
-        }
-        buffer.hasWritten(len);
+
+
         if (headers_.find("connection") == headers_.end())
         {
             if (closeConnection_)
@@ -577,6 +584,7 @@ void HttpResponseImpl::makeHeaderString(trantor::MsgBuffer &buffer)
         buffer.append("\r\n");
     }
 }
+
 void HttpResponseImpl::renderToBuffer(trantor::MsgBuffer &buffer)
 {
     if (expriedTime_ >= 0)
@@ -620,6 +628,7 @@ void HttpResponseImpl::renderToBuffer(trantor::MsgBuffer &buffer)
     if (bodyPtr_)
         buffer.append(bodyPtr_->data(), bodyPtr_->length());
 }
+
 std::shared_ptr<trantor::MsgBuffer> HttpResponseImpl::renderToBuffer()
 {
     if (expriedTime_ >= 0)
