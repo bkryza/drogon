@@ -99,6 +99,7 @@ static HttpResponsePtr getCompressedResponse(const HttpRequestImplPtr &req,
     }
     return response;
 }
+
 static bool isWebSocket(const HttpRequestImplPtr &req)
 {
     auto &headers = req->headers();
@@ -362,10 +363,6 @@ void HttpServer::onRequests(
     {
         bool close_ = (!req->keepAlive());
         bool isHeadMethod = (req->method() == Head);
-        if (isHeadMethod)
-        {
-            req->setMethod(Get);
-        }
         bool syncFlag = false;
         if (!requestParser->emptyPipelining())
         {
