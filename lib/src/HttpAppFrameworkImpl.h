@@ -650,7 +650,7 @@ class HttpAppFrameworkImpl final : public HttpAppFramework
     std::pair<unsigned int, std::string> floatPrecisionInJson_{0,
                                                                "significant"};
     bool usingCustomErrorHandler_{false};
-    size_t clientMaxBodySize_{1024 * 1024};
+    size_t clientMaxBodySize_{20 * 1024 * 1024};
     size_t clientMaxMemoryBodySize_{64 * 1024};
     size_t clientMaxWebSocketMessageSize_{128 * 1024};
     std::string homePageFile_{"index.html"};
