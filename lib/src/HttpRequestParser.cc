@@ -132,7 +132,7 @@ bool HttpRequestParser::parseRequest(MsgBuffer *buf)
 {
     bool ok = true;
     bool hasMore = true;
-    //  std::cout<<std::string(buf->peek(),buf->readableBytes())<<std::endl;
+
     while (hasMore)
     {
         if (status_ == HttpRequestParseStatus::kExpectMethod)
@@ -259,7 +259,8 @@ bool HttpRequestParser::parseRequest(MsgBuffer *buf)
                     }
 
                     auto &expect = request_->expect();
-                    if (expect == "100-continue" &&
+                    if ((expect == "100-continue" ||
+                         expect == "100-Continue") &&
                         request_->getVersion() >= Version::kHttp11)
                     {
                         if (currentContentLength_ == 0)
