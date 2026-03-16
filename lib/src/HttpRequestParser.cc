@@ -263,7 +263,8 @@ bool HttpRequestParser::parseRequest(MsgBuffer *buf)
                          expect == "100-Continue") &&
                         request_->getVersion() >= Version::kHttp11)
                     {
-                        if (currentContentLength_ == 0)
+                        if (currentContentLength_ == 0 &&
+                            request_->headers().count("x-amz-decoded-content-length") == 0)
                         {
                             buf->retrieveAll();
                             shutdownConnection(k400BadRequest);
